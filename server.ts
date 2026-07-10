@@ -1,7 +1,7 @@
 import app from "./src/app";
+import {env} from "./src/config/env"
 
-const PORT = 3001;
 
-app.listen(PORT, () => {
-  console.log(` Finance backend running on http://localhost:${PORT}`);
+app.listen(env.PORT, () => {
+  console.log(` Finance backend running on http://localhost:${env.PORT}`);
 });
