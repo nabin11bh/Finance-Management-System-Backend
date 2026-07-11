@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import { env } from "./config/env";
 import { requestLogger } from "./middleware/requestLogger";
 import { errorHandler } from "./middleware/errorHandler";
+import authRoutes from "./modules/auth/auth.routes";
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(requestLogger);
+app.use("/api/v1/auth", authRoutes);
 
 app.get("/api/v1/health", (_req, res) => {
   res.json({ success: true, data: { status: "ok" } });
