@@ -3,6 +3,10 @@ import jwt, { SignOptions } from "jsonwebtoken";
 import { prisma } from "../../config/database";
 import { env } from "../../config/env";
 import { AppError } from "../../middleware/errorHandler";
+import { writeAuditLog } from "../../services/audit.service";
+
+const revokedRefreshTokens = new Set<string>();
+// v1.0 runs a single instance; move to Redis before scaling horizontally.
 
 function signAccessToken(userId: string, email: string) {
   return jwt.sign({ sub: userId, email }, env.JWT_ACCESS_SECRET, {
@@ -16,16 +20,24 @@ function signRefreshToken(userId: string) {
   } as SignOptions);
 }
 
-export async function login(email: string, password: string) {
+export async function login(email: string, password: string, ip?: string) {
   const user = await prisma.user.findFirst({
     where: { email, deletedAt: null },
     include: { userRoles: { include: { role: true } } },
   });
 
-  if (!user) throw new AppError(401, "INVALID_CREDENTIALS", "Email or password is incorrect");
+  if (!user) {
+    await writeAuditLog({ action: "USER_LOGIN_FAILED", ipAddress: ip, newValues: { email } });
+    throw new AppError(401, "INVALID_CREDENTIALS", "Email or password is incorrect");
+  }
 
   const valid = await bcrypt.compare(password, user.passwordHash);
-  if (!valid) throw new AppError(401, "INVALID_CREDENTIALS", "Email or password is incorrect");
+  if (!valid) {
+    await writeAuditLog({ userId: user.id, action: "USER_LOGIN_FAILED", ipAddress: ip });
+    throw new AppError(401, "INVALID_CREDENTIALS", "Email or password is incorrect");
+  }
+
+  await writeAuditLog({ userId: user.id, action: "USER_LOGIN", ipAddress: ip });
 
   return {
     accessToken: signAccessToken(user.id, user.email),
@@ -38,9 +50,6 @@ export async function login(email: string, password: string) {
     },
   };
 }
-
-const revokedRefreshTokens = new Set<string>();
-// v1.0 runs a single instance;
 
 export async function refresh(refreshToken: string) {
   if (!refreshToken) throw new AppError(401, "UNAUTHORIZED", "Refresh token missing");
@@ -61,6 +70,7 @@ export async function refresh(refreshToken: string) {
   return { accessToken: signAccessToken(user.id, user.email) };
 }
 
-export async function logout(refreshToken: string | undefined) {
+export async function logout(refreshToken: string | undefined, userId?: string, ip?: string) {
   if (refreshToken) revokedRefreshTokens.add(refreshToken);
+  await writeAuditLog({ userId, action: "USER_LOGOUT", ipAddress: ip });
 }
