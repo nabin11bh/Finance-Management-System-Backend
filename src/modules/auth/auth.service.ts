@@ -38,3 +38,29 @@ export async function login(email: string, password: string) {
     },
   };
 }
+
+const revokedRefreshTokens = new Set<string>();
+// v1.0 runs a single instance;
+
+export async function refresh(refreshToken: string) {
+  if (!refreshToken) throw new AppError(401, "UNAUTHORIZED", "Refresh token missing");
+  if (revokedRefreshTokens.has(refreshToken)) {
+    throw new AppError(401, "UNAUTHORIZED", "Refresh token has been revoked");
+  }
+
+  let payload: { sub: string };
+  try {
+    payload = jwt.verify(refreshToken, env.JWT_REFRESH_SECRET) as { sub: string };
+  } catch {
+    throw new AppError(401, "UNAUTHORIZED", "Refresh token is invalid or expired");
+  }
+
+  const user = await prisma.user.findFirst({ where: { id: payload.sub, deletedAt: null } });
+  if (!user) throw new AppError(401, "UNAUTHORIZED", "User no longer exists");
+
+  return { accessToken: signAccessToken(user.id, user.email) };
+}
+
+export async function logout(refreshToken: string | undefined) {
+  if (refreshToken) revokedRefreshTokens.add(refreshToken);
+}

@@ -26,3 +26,24 @@ export async function loginHandler(req: Request, res: Response, next: NextFuncti
   }
   
 }
+
+export async function refreshHandler(req: Request, res: Response, next: NextFunction) {
+  try {
+    const refreshToken = req.cookies?.[REFRESH_COOKIE_NAME];
+    const result = await authService.refresh(refreshToken);
+    return res.status(200).json({ success: true, data: result });
+  } catch (err) {
+    return next(err);
+  }
+}
+
+export async function logoutHandler(req: Request, res: Response, next: NextFunction) {
+  try {
+    const refreshToken = req.cookies?.[REFRESH_COOKIE_NAME];
+    await authService.logout(refreshToken);
+    res.clearCookie(REFRESH_COOKIE_NAME);
+    return res.status(200).json({ success: true, data: { message: "Logged out" } });
+  } catch (err) {
+    return next(err);
+  }
+}
