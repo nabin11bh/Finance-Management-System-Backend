@@ -9,6 +9,7 @@ import authRoutes from "./modules/auth/auth.routes";
 import { authGuard } from "./middleware/authGuard";
 import { prisma } from "./config/database";
 import categoryRoutes from "./modules/category/category.routes";
+import incomeRoutes from "./modules/income/income.routes";
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(cookieParser());
 app.use(requestLogger);
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1", categoryRoutes);
+app.use("/api/v1/income", incomeRoutes);
 
 
 
