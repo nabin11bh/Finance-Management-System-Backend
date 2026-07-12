@@ -3,6 +3,8 @@ import { prisma } from "../config/database";
 interface AuditEntry {
   userId?: string | null;
   action: string;
+   entityType: string;
+  entityId: string;
   ipAddress?: string | null;
   newValues?: unknown;
 }
