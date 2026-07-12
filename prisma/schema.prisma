@@ -59,3 +59,24 @@ model AuditLog {
   @@index([createdAt])
   @@map("audit_logs")
 }
+
+model IncomeCategory {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  @@map("income_categories")
+}
+
+model ExpenseCategory {
+  id          String    @id @default(uuid())
+  groupName   String    @map("group_name")
+  name        String
+  description String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  @@map("expense_categories")
+}
