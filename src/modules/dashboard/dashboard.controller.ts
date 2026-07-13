@@ -10,3 +10,16 @@ export async function getKpisHandler(req: Request, res: Response, next: NextFunc
     return next(err);
   }
 }
+
+export async function getIncomeExpenseChartHandler(req: Request, res: Response, next: NextFunction) {
+  try {
+    const period = (req.query.period as string) || "monthly";
+    if (!["daily", "weekly", "monthly", "yearly"].includes(period)) {
+      return res.status(400).json({ success: false, error: { code: "VALIDATION_ERROR", message: "Invalid period" } });
+    }
+    const data = await dashboardService.getIncomeExpenseChart(period as any);
+    return sendSuccess(res, data);
+  } catch (err) {
+    return next(err);
+  }
+}
