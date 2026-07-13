@@ -39,3 +39,6 @@ export const listIncomeQuerySchema = z.object({
   client_name: z.string().optional(),
   search: z.string().optional(),
 });
+export const idParamSchema = z.object({
+  id: z.string().uuid("id must be a valid UUID"),
+});

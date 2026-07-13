@@ -118,3 +118,69 @@ export async function getIncomeById(id: string) {
   if (!income) throw new AppError(404, "NOT_FOUND", "Income record not found");
   return income;
 }
+
+
+interface UpdateIncomeInput {
+  transactionDate?: string;
+  amount?: number;
+  incomeCategoryId?: string;
+  incomeSource?: string;
+  clientName?: string;
+  paymentMethod?: string;
+  referenceNumber?: string;
+  invoiceNumber?: string;
+  description?: string;
+}
+
+export async function updateIncome(id: string, input: UpdateIncomeInput, userId: string, ip?: string) {
+  const existing = await getIncomeById(id);
+
+  if (input.incomeCategoryId) await assertCategoryExists(input.incomeCategoryId);
+
+  const updated = await prisma.income.update({
+    where: { id },
+    data: {
+      ...(input.transactionDate && { transactionDate: new Date(input.transactionDate) }),
+      ...(input.amount !== undefined && { amount: input.amount }),
+      ...(input.incomeCategoryId && { incomeCategoryId: input.incomeCategoryId }),
+      ...(input.incomeSource !== undefined && { incomeSource: input.incomeSource }),
+      ...(input.clientName !== undefined && { clientName: input.clientName }),
+      ...(input.paymentMethod && { paymentMethod: input.paymentMethod }),
+      ...(input.referenceNumber !== undefined && { referenceNumber: input.referenceNumber }),
+      ...(input.invoiceNumber !== undefined && { invoiceNumber: input.invoiceNumber }),
+      ...(input.description !== undefined && { description: input.description }),
+      updatedBy: userId,
+    },
+    include: { category: true },
+  });
+
+  await writeAuditLog({
+    userId,
+    action: "INCOME_UPDATED",
+    entityType: "income",
+    entityId: id,
+    oldValues: existing,
+    newValues: updated,
+    ipAddress: ip,
+  });
+
+  return updated;
+}
+
+export async function deleteIncome(id: string, userId: string, ip?: string) {
+  const existing = await getIncomeById(id);
+
+  await prisma.income.update({
+    where: { id },
+    data: { deletedAt: new Date(), updatedBy: userId },
+  });
+
+  await writeAuditLog({
+    userId,
+    action: "INCOME_DELETED",
+    entityType: "income",
+    entityId: id,
+    oldValues: existing,
+    ipAddress: ip,
+  });
+}

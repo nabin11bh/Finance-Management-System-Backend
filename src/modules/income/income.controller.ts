@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { createIncomeSchema, listIncomeQuerySchema } from "./income.validation";
+import { createIncomeSchema, updateIncomeSchema, listIncomeQuerySchema, idParamSchema } from "./income.validation";
 import * as incomeService from "./income.service";
 import { sendSuccess } from "../../utils/response";
 
@@ -17,7 +17,7 @@ export async function listIncomeHandler(req: Request, res: Response, next: NextF
   try {
     const query = listIncomeQuerySchema.parse(req.query);
     const { records, meta } = await incomeService.listIncome(query);
-    return sendSuccess(res, records, 200, meta);
+    return res.status(200).json({ success: true, data: { records, meta } });
   } catch (err) {
     return next(err);
   }
@@ -25,8 +25,30 @@ export async function listIncomeHandler(req: Request, res: Response, next: NextF
 
 export async function getIncomeHandler(req: Request, res: Response, next: NextFunction) {
   try {
-    const income = await incomeService.getIncomeById(req.params.id);
+    const { id } = idParamSchema.parse(req.params);
+    const income = await incomeService.getIncomeById(id);
     return sendSuccess(res, income);
+  } catch (err) {
+    return next(err);
+  }
+}
+
+export async function updateIncomeHandler(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { id } = idParamSchema.parse(req.params);
+    const input = updateIncomeSchema.parse(req.body);
+    const income = await incomeService.updateIncome(id, input, req.user!.sub, req.ip);
+    return sendSuccess(res, income);
+  } catch (err) {
+    return next(err);
+  }
+}
+
+export async function deleteIncomeHandler(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { id } = idParamSchema.parse(req.params);
+    await incomeService.deleteIncome(id, req.user!.sub, req.ip);
+    return res.status(204).send();
   } catch (err) {
     return next(err);
   }

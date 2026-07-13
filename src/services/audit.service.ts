@@ -4,6 +4,7 @@ interface AuditEntry {
   userId?: string | null;
   action: string;
    entityType: string;
+   oldValues?:unknown;
   entityId: string;
   ipAddress?: string | null;
   newValues?: unknown;
