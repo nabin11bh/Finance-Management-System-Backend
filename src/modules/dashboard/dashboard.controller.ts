@@ -55,3 +55,12 @@ export async function getMonthlyCashFlowHandler(req: Request, res: Response, nex
     return next(err);
   }
 }
+
+export async function getRecentTransactionsHandler(req: Request, res: Response, next: NextFunction) {
+  try {
+    const data = await dashboardService.getRecentTransactions();
+    return sendSuccess(res, data);
+  } catch (err) {
+    return next(err);
+  }
+}

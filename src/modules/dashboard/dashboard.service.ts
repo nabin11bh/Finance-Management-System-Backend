@@ -186,3 +186,44 @@ export async function getMonthlyCashFlow(year: number) {
 
   return months.map((m) => ({ ...m, profit: m.income - m.expense }));
 }
+
+
+//recent transaction widgets
+
+export async function getRecentTransactions() {
+  const [incomes, expenses] = await Promise.all([
+    prisma.income.findMany({
+      where: { deletedAt: null },
+      include: { category: true },
+      orderBy: { transactionDate: "desc" },
+      take: 20,
+    }),
+    prisma.expense.findMany({
+      where: { deletedAt: null },
+      include: { category: true },
+      orderBy: { expenseDate: "desc" },
+      take: 20,
+    }),
+  ]);
+
+  const combined = [
+    ...incomes.map((i) => ({
+      id: i.id,
+      type: "income" as const,
+      date: i.transactionDate,
+      amount: Number(i.amount),
+      category: i.category.name,
+      counterparty: i.clientName,
+    })),
+    ...expenses.map((e) => ({
+      id: e.id,
+      type: "expense" as const,
+      date: e.expenseDate,
+      amount: Number(e.amount),
+      category: e.category.name,
+      counterparty: e.vendorName,
+    })),
+  ];
+
+  return combined.sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 20);
+}

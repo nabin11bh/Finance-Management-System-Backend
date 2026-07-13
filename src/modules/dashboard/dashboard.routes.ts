@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getKpisHandler,getIncomeExpenseChartHandler,getIncomeByCategoryHandler,getExpenseByCategoryHandler,getMonthlyCashFlowHandler } from "./dashboard.controller";
+import { getKpisHandler,getIncomeExpenseChartHandler,getIncomeByCategoryHandler,getExpenseByCategoryHandler,getMonthlyCashFlowHandler,getRecentTransactionsHandler } from "./dashboard.controller";
 import { authGuard } from "../../middleware/authGuard";
 
 
@@ -11,5 +11,6 @@ router.get("/income-expense-chart", getIncomeExpenseChartHandler);
 router.get("/income-by-category", getIncomeByCategoryHandler);
 router.get("/expense-by-category", getExpenseByCategoryHandler);
 router.get("/monthly-cash-flow", getMonthlyCashFlowHandler);
+router.get("/recent-transactions", getRecentTransactionsHandler);
 
 export default router;
