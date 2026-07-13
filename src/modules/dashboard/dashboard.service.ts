@@ -87,3 +87,69 @@ export async function getIncomeExpenseChart(period: Period) {
       profit: values.income - values.expense,
     }));
 }
+
+//category piechart data
+
+export async function getIncomeByCategory(from?: string, to?: string) {
+  const where: any = { deletedAt: null };
+  if (from || to) {
+    where.transactionDate = {};
+    if (from) where.transactionDate.gte = new Date(from);
+    if (to) where.transactionDate.lte = new Date(to);
+  }
+
+  const grouped = await prisma.income.groupBy({
+    by: ["incomeCategoryId"],
+    where,
+    _sum: { amount: true },
+  });
+
+  const categories = await prisma.incomeCategory.findMany({
+    where: { id: { in: grouped.map((g) => g.incomeCategoryId) } },
+  });
+
+  const total = grouped.reduce((sum, g) => sum + Number(g._sum.amount ?? 0), 0);
+
+  return grouped.map((g) => {
+    const category = categories.find((c) => c.id === g.incomeCategoryId);
+    const amount = Number(g._sum.amount ?? 0);
+    return {
+      categoryId: g.incomeCategoryId,
+      categoryName: category?.name ?? "Unknown",
+      amount,
+      percentage: total > 0 ? Math.round((amount / total) * 1000) / 10 : 0,
+    };
+  });
+}
+
+export async function getExpenseByCategory(from?: string, to?: string) {
+  const where: any = { deletedAt: null };
+  if (from || to) {
+    where.expenseDate = {};
+    if (from) where.expenseDate.gte = new Date(from);
+    if (to) where.expenseDate.lte = new Date(to);
+  }
+
+  const grouped = await prisma.expense.groupBy({
+    by: ["expenseCategoryId"],
+    where,
+    _sum: { amount: true },
+  });
+
+  const categories = await prisma.expenseCategory.findMany({
+    where: { id: { in: grouped.map((g) => g.expenseCategoryId) } },
+  });
+
+  const total = grouped.reduce((sum, g) => sum + Number(g._sum.amount ?? 0), 0);
+
+  return grouped.map((g) => {
+    const category = categories.find((c) => c.id === g.expenseCategoryId);
+    const amount = Number(g._sum.amount ?? 0);
+    return {
+      categoryId: g.expenseCategoryId,
+      categoryName: category?.name ?? "Unknown",
+      amount,
+      percentage: total > 0 ? Math.round((amount / total) * 1000) / 10 : 0,
+    };
+  });
+}

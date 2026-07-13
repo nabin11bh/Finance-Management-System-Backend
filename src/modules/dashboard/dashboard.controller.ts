@@ -23,3 +23,24 @@ export async function getIncomeExpenseChartHandler(req: Request, res: Response, 
     return next(err);
   }
 }
+
+
+export async function getIncomeByCategoryHandler(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { from, to } = req.query as { from?: string; to?: string };
+    const data = await dashboardService.getIncomeByCategory(from, to);
+    return sendSuccess(res, data);
+  } catch (err) {
+    return next(err);
+  }
+}
+
+export async function getExpenseByCategoryHandler(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { from, to } = req.query as { from?: string; to?: string };
+    const data = await dashboardService.getExpenseByCategory(from, to);
+    return sendSuccess(res, data);
+  } catch (err) {
+    return next(err);
+  }
+}
