@@ -153,3 +153,36 @@ export async function getExpenseByCategory(from?: string, to?: string) {
     };
   });
 }
+
+//monthly cash flow by line chart
+
+export async function getMonthlyCashFlow(year: number) {
+  const yearStart = new Date(year, 0, 1);
+  const yearEnd = new Date(year, 11, 31, 23, 59, 59, 999);
+
+  const [incomeRecords, expenseRecords] = await Promise.all([
+    prisma.income.findMany({
+      where: { deletedAt: null, transactionDate: { gte: yearStart, lte: yearEnd } },
+      select: { transactionDate: true, amount: true },
+    }),
+    prisma.expense.findMany({
+      where: { deletedAt: null, expenseDate: { gte: yearStart, lte: yearEnd } },
+      select: { expenseDate: true, amount: true },
+    }),
+  ]);
+
+  const months = Array.from({ length: 12 }, (_, i) => ({
+    month: i + 1,
+    income: 0,
+    expense: 0,
+  }));
+
+  for (const rec of incomeRecords) {
+    months[rec.transactionDate.getMonth()].income += Number(rec.amount);
+  }
+  for (const rec of expenseRecords) {
+    months[rec.expenseDate.getMonth()].expense += Number(rec.amount);
+  }
+
+  return months.map((m) => ({ ...m, profit: m.income - m.expense }));
+}

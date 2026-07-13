@@ -44,3 +44,14 @@ export async function getExpenseByCategoryHandler(req: Request, res: Response, n
     return next(err);
   }
 }
+
+
+export async function getMonthlyCashFlowHandler(req: Request, res: Response, next: NextFunction) {
+  try {
+    const year = parseInt((req.query.year as string) ?? new Date().getFullYear().toString(), 10);
+    const data = await dashboardService.getMonthlyCashFlow(year);
+    return sendSuccess(res, data);
+  } catch (err) {
+    return next(err);
+  }
+}
