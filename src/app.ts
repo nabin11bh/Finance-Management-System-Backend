@@ -11,6 +11,7 @@ import { prisma } from "./config/database";
 import categoryRoutes from "./modules/category/category.routes";
 import incomeRoutes from "./modules/income/income.routes";
 import expenseRoutes from "./modules/expense/expense.routes";
+import dashboardRoutes from "./modules/dashboard/dashboard.routes";
 
 const app = express();
 
@@ -23,6 +24,8 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1", categoryRoutes);
 app.use("/api/v1/income", incomeRoutes);
 app.use("/api/v1/expense", expenseRoutes);
+app.use("/api/v1/dashboard", dashboardRoutes);
+
 
 
 
