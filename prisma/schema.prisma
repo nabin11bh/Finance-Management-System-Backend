@@ -132,3 +132,39 @@ model Expense {
   @@index([amount])
   @@map("expense")
 }
+
+model Note {
+  id          String    @id @default(uuid())
+  title       String
+  description String
+  colorLabel  String?   @map("color_label")
+  isPinned    Boolean   @default(false) @map("is_pinned")
+  isArchived  Boolean   @default(false) @map("is_archived")
+
+  createdBy String    @map("created_by")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("notes")
+}
+
+model Reminder {
+  id           String    @id @default(uuid())
+  title        String
+  description  String?
+  reminderDate DateTime  @map("reminder_date") @db.Date
+  reminderTime String?   @map("reminder_time")
+  priority     String
+  status       String    @default("PENDING")
+  repeat       String    @default("NONE")
+
+  createdBy String    @map("created_by")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@index([reminderDate])
+  @@index([status])
+  @@map("reminders")
+}
