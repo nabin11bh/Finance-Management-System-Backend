@@ -21,6 +21,7 @@ export async function listIncomeHandler(req: Request, res: Response, next: NextF
   } catch (err) {
     return next(err);
   }
+  
 }
 
 export async function getIncomeHandler(req: Request, res: Response, next: NextFunction) {

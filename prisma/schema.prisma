@@ -78,6 +78,8 @@ model ExpenseCategory {
   createdAt   DateTime  @default(now()) @map("created_at")
   deletedAt   DateTime? @map("deleted_at")
 
+    expenses Expense[]
+
   @@map("expense_categories")
 }
 
@@ -105,4 +107,28 @@ model Income {
   @@index([deletedAt])
   @@index([amount])
   @@map("income")
+}
+
+model Expense {
+  id                String    @id @default(uuid())
+  expenseDate       DateTime  @map("expense_date") @db.Date
+  amount            Decimal   @db.Decimal(15, 2)
+  expenseCategoryId String    @map("expense_category_id")
+  vendorName        String?   @map("vendor_name")
+  paymentMethod     String    @map("payment_method")
+  billNumber        String?   @map("bill_number")
+  description       String?
+
+  createdBy String    @map("created_by")
+  updatedBy String?   @map("updated_by")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  category ExpenseCategory @relation(fields: [expenseCategoryId], references: [id])
+
+  @@index([expenseDate])
+  @@index([deletedAt])
+  @@index([amount])
+  @@map("expense")
 }
