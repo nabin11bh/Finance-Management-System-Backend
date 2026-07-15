@@ -73,7 +73,7 @@ async function main() {
     const seedPassword = process.env.SEED_ACCOUNTANT_PASSWORD;
     if (!seedPassword) {
       throw new Error(
-        "SEED_ACCOUNTANT_PASSWORD env var is not set. Set it before running the seed (do not use the old hardcoded default in production)."
+        
       );
     }
     const passwordHash = await bcrypt.hash(seedPassword, 12);

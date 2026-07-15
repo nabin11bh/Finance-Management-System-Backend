@@ -41,7 +41,11 @@ export async function logoutHandler(req: Request, res: Response, next: NextFunct
   try {
     const refreshToken = req.cookies?.[REFRESH_COOKIE_NAME];
     await authService.logout(refreshToken);
-    res.clearCookie(REFRESH_COOKIE_NAME);
+    res.clearCookie(REFRESH_COOKIE_NAME, {
+        httpOnly: true,
+        secure: true,
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+      });
     return res.status(200).json({ success: true, data: { message: "Logged out" } });
   } catch (err) {
     return next(err);
