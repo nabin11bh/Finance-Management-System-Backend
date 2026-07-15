@@ -64,3 +64,13 @@ export async function getRecentTransactionsHandler(req: Request, res: Response, 
     return next(err);
   }
 }
+
+
+export async function getUpcomingRemindersHandler(req: Request, res: Response, next: NextFunction) {
+  try {
+    const data = await dashboardService.getUpcomingReminders();
+    return sendSuccess(res, data);
+  } catch (err) {
+    return next(err);
+  }
+}

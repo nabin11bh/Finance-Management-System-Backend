@@ -227,3 +227,19 @@ export async function getRecentTransactions() {
 
   return combined.sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 20);
 }
+
+export async function getUpcomingReminders() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const sevenDaysOut = new Date(today);
+  sevenDaysOut.setDate(sevenDaysOut.getDate() + 7);
+
+  return prisma.reminder.findMany({
+    where: {
+      deletedAt: null,
+      status: "PENDING",
+      reminderDate: { gte: today, lte: sevenDaysOut },
+    },
+    orderBy: [{ reminderDate: "asc" }, { priority: "desc" }],
+  });
+}
