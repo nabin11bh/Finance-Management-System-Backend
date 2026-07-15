@@ -70,13 +70,18 @@ async function main() {
   const existingUser = await prisma.user.findUnique({ where: { email } });
 
   if (!existingUser) {
-    const passwordHash = await bcrypt.hash("ChangeMe123!", 12);
+    const seedPassword = process.env.SEED_ACCOUNTANT_PASSWORD;
+    if (!seedPassword) {
+      throw new Error(
+        "SEED_ACCOUNTANT_PASSWORD env var is not set. Set it before running the seed (do not use the old hardcoded default in production)."
+      );
+    }
+    const passwordHash = await bcrypt.hash(seedPassword, 12);
     const user = await prisma.user.create({
       data: { fullName: "Default Accountant", email, passwordHash },
     });
     await prisma.userRole.create({ data: { userId: user.id, roleId: accountantRole.id } });
-    console.log(`Seeded: ${email} / ChangeMe123! — change this after first login`);
-    
+    console.log(`Seeded: ${email}`);
   }
 
   for (const [name, description] of INCOME_CATEGORIES) {

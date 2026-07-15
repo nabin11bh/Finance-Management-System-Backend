@@ -12,8 +12,8 @@ export async function loginHandler(req: Request, res: Response, next: NextFuncti
 
     res.cookie(REFRESH_COOKIE_NAME, result.refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
       maxAge: REFRESH_COOKIE_MAX_AGE_MS,
     });
 
