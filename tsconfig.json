@@ -10,7 +10,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    
+    "moduleResolution": "node"
   },
   "include": ["src/**/*.ts", "server.ts", "prisma/**/*.ts"],
   "exclude": ["node_modules", "dist"]
