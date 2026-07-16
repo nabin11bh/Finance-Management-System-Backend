@@ -3,11 +3,11 @@ import { prisma } from "../config/database";
 interface AuditEntry {
   userId?: string | null;
   action: string;
-   entityType: string;
-   oldValues?:unknown;
-  entityId: string;
-  ipAddress?: string | null;
+  entityType?: string | null;
+  entityId?: string | null;
+  oldValues?: unknown;
   newValues?: unknown;
+  ipAddress?: string | null;
 }
 
 export async function writeAuditLog(entry: AuditEntry) {
