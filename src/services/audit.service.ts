@@ -16,12 +16,15 @@ export async function writeAuditLog(entry: AuditEntry) {
       data: {
         userId: entry.userId ?? null,
         action: entry.action,
-        ipAddress: entry.ipAddress ?? null,
+        entityType: entry.entityType ?? null,
+        entityId: entry.entityId ?? null,
+        oldValues: entry.oldValues ? JSON.parse(JSON.stringify(entry.oldValues)) : undefined,
         newValues: entry.newValues ? JSON.parse(JSON.stringify(entry.newValues)) : undefined,
+        ipAddress: entry.ipAddress ?? null,
       },
     });
   } catch (err) {
-    // Audit logging must never break the primary request flow.
+    
     console.error("Failed to write audit log:", err);
   }
 }
