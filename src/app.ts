@@ -15,6 +15,7 @@ import dashboardRoutes from "./modules/dashboard/dashboard.routes";
 import noteRoutes from "./modules/note/note.routes";
 import reminderRoutes from "./modules/reminder/reminder.routes";
 import reportRoutes from "./modules/report/report.routes";
+import attachmentRoutes from "./modules/attachment/attachment.routes"
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api/v1/notes", noteRoutes);
 app.use("/api/v1/reminders", reminderRoutes);
 app.use("/api/v1/reports", reportRoutes);
+app.use("/api/v1/attachments", attachmentRoutes);
 
 
 
