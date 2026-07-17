@@ -16,7 +16,7 @@ import noteRoutes from "./modules/note/note.routes";
 import reminderRoutes from "./modules/reminder/reminder.routes";
 import reportRoutes from "./modules/report/report.routes";
 import attachmentRoutes from "./modules/attachment/attachment.routes"
-
+import auditRoutes from "./modules/audit/audit.routes";
 const app = express();
 
 app.use(helmet());
@@ -33,6 +33,7 @@ app.use("/api/v1/notes", noteRoutes);
 app.use("/api/v1/reminders", reminderRoutes);
 app.use("/api/v1/reports", reportRoutes);
 app.use("/api/v1/attachments", attachmentRoutes);
+app.use("/api/v1/audit-logs", auditRoutes);
 
 
 

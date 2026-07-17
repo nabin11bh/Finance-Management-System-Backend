@@ -57,8 +57,9 @@ export async function uploadAttachments(
     ipAddress: ip,
   });
 
-  return created;
+  return created.map((a) => ({ ...a, fileSize: a.fileSize.toString() }));
 }
+
 
 export async function listAttachments(entityType: EntityType, entityId: string) {
   const attachments = await prisma.attachment.findMany({
