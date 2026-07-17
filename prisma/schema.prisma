@@ -168,3 +168,27 @@ model Reminder {
   @@index([status])
   @@map("reminders")
 }
+
+
+model Attachment {
+  id         String    @id @default(uuid())
+  entityType String    @map("entity_type") // "income" | "expense" | "reminder"
+  entityId   String    @map("entity_id")
+  fileName   String    @map("file_name")
+  fileSize   BigInt    @map("file_size")
+  mimeType   String    @map("mime_type")
+  storageKey String    @map("storage_key")
+  storageUrl String    @map("storage_url")
+  provider   String
+
+  uploadedBy String    @map("uploaded_by")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  deletedAt  DateTime? @map("deleted_at")
+
+  // entity_type + entity_id is a polymorphic reference (income | expense | reminder).
+  // Postgres/Prisma can't enforce one FK constraint across 3 target tables, so this
+  // link is validated at the application layer (see attachment.service.ts), not via @relation.
+
+  @@index([entityType, entityId])
+  @@map("attachments")
+}
